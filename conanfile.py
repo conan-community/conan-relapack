@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from conans import ConanFile, tools
+from conans import ConanFile, tools, AutoToolsBuildEnvironment
 import os
 
 
@@ -20,7 +17,9 @@ class lapackConan(ConanFile):
         os.rename("%s-%s" % (self.name, self.version), "sources")
 
     def build(self):
-        self.run("cd sources && make")
+        with tools.chdir("sources"):
+            env_build = AutoToolsBuildEnvironment(self)
+            env_build.make()
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src="sources", ignore_case=True, keep_path=False)
