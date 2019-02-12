@@ -11,6 +11,7 @@ class relapackConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
+    description = "Recursive LAPACK Collection"
     url = "https://github.com/conan-community/conan-lapack"
     homepage = "https://github.com/HPAC/ReLAPACK"
     author = "Conan Community"
