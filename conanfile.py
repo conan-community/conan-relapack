@@ -1,46 +1,57 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
-from conans import ConanFile, tools, AutoToolsBuildEnvironment
+import os
+from conans import ConanFile, tools, CMake
 
 
 class relapackConan(ConanFile):
     name = "relapack"
     version = "1.0"
-    url = "https://github.com/HPAC/ReLAPACK"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False]}
-    default_options = "shared=True"
+    options = {"shared": [True, False], "fPIC": [True, False]}
+    default_options = {"shared": False, "fPIC": True}
+    url = "https://github.com/conan-community/conan-lapack"
+    homepage = "https://github.com/HPAC/ReLAPACK"
+    author = "Conan Community"
+    topics = ("conan", "relapack", "lapack", "recursive")
+    license = "MIT"
+    exports = "LICENSE.md"
+    exports_sources = "CMakeLists.txt"
+    generators = "cmake"
     requires = "lapack/3.7.1@conan/stable"
-
-    @property
-    def source_subfolder(self):
-        return "sources"
+    _source_subfolder = "source_subfolder"
 
     def config_options(self):
+        if self.settings.os == "Windows":
+            del self.options.fPIC
         if self.settings.compiler == "Visual Studio":
             self.options["lapack"].visual_studio = True
 
+    def configure(self):
+        del self.settings.compiler.libcxx
+
     def source(self):
-        source_url = ("%s/archive/v%s.zip" % (self.url, self.version))
-        tools.get(source_url)
-        os.rename("%s-%s" % (self.name, self.version), self.source_subfolder)
+        sha256 = "71740aee26a95de9f3226ea1c3d8bd7a9992e718593bb0101f8c772183147719"
+        tools.get("%s/archive/v%s.tar.gz" % (self.homepage, self.version), sha256=sha256)
+        extracted_dir = "ReLAPACK-%s" % self.version
+        os.rename(extracted_dir, self._source_subfolder)
+
+    def _configure_cmake(self):
+        cmake = CMake(self)
+        cmake.configure()
+        return cmake
 
     def build(self):
-        with tools.chdir(self.source_subfolder):
-            autotools = AutoToolsBuildEnvironment(self)
-            make = tools.get_env("CONAN_MAKE_PROGRAM", "make")
-            if tools.which("mingw32-make"):
-                make = "mingw32-make"
-            autotools.make(make_program=make)
+        cmake = self._configure_cmake()
+        cmake.build()
 
     def package(self):
-        self.copy(pattern="LICENSE", dst="licenses", src=self.source_subfolder, keep_path=False)
-        self.copy(pattern="*.h", dst="include", src="%s/inc" % self.source_subfolder, keep_path=False)
-        self.copy(pattern="*relapack*.dll", dst="bin", src="bin", keep_path=False)
-        self.copy(pattern="*relapack*.so*", dst="lib", src="lib", keep_path=False)
-        self.copy(pattern="*relapack*.dylib", dst="lib", src="lib", keep_path=False)
-        self.copy(pattern="*relapack*.lib", dst="lib", src="lib", keep_path=False)
-        self.copy(pattern="*relapack*.a", dst="lib", src=".", keep_path=False)
-        self.copy(pattern="*relapack*.a", dst="lib", src="lib", keep_path=False)
+        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder, keep_path=False)
+        cmake = self._configure_cmake()
+        cmake.install()
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
+        if self.settings.os == "Linux":
+            self.cpp_info.libs.append('m')
