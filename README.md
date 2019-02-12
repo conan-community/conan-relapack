@@ -1,4 +1,7 @@
 [![Download](https://api.bintray.com/packages/conan-community/conan/relapack%3Aconan/images/download.svg) ](https://bintray.com/conan-community/conan/relapack%3Aconan/_latestVersion)
+[![Build Status Travis](https://travis-ci.org/conan-community/conan-relapack.svg)](https://travis-ci.org/conan-community/conan-relapack)
+[![Build Status AppVeyor](https://ci.appveyor.com/api/projects/status/github/conan-community/conan-relapack?svg=true)](https://ci.appveyor.com/project/ConanCIintegration/conan-relapack)
+
 
 ## Conan package recipe for *relapack*
 
@@ -47,7 +50,8 @@ The following command both runs all the steps of the conan file, and publishes t
 ### Available Options
 | Option        | Default | Possible Values  |
 | ------------- |:----------------- |:------------:|
-| shared      | True |  [True, False] |
+| shared      | False |  [True, False] |
+| fPIC        | True |  [True, False] |
 
 
 ## Add Remote
