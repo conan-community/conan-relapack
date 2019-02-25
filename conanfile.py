@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-import os
 from conans import ConanFile, tools, CMake
 
 
@@ -22,6 +21,7 @@ class relapackConan(ConanFile):
     generators = "cmake"
     requires = "lapack/3.7.1@conan/stable"
     _source_subfolder = "source_subfolder"
+    _build_subfolder = "build_subfolder"
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -40,7 +40,7 @@ class relapackConan(ConanFile):
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        cmake.configure()
+        cmake.configure(build_dir=self._build_subfolder)
         return cmake
 
     def build(self):
@@ -48,7 +48,7 @@ class relapackConan(ConanFile):
         cmake.build()
 
     def package(self):
-        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder, keep_path=False)
+        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
         cmake = self._configure_cmake()
         cmake.install()
 
