@@ -28,6 +28,7 @@ class relapackConan(ConanFile):
             del self.options.fPIC
         if self.settings.compiler == "Visual Studio":
             self.options["lapack"].visual_studio = True
+            self.options["lapack"].shared = True
 
     def configure(self):
         del self.settings.compiler.libcxx
