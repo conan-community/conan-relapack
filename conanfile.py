@@ -20,6 +20,7 @@ class relapackConan(ConanFile):
     exports_sources = "CMakeLists.txt"
     generators = "cmake"
     requires = "lapack/3.7.1@conan/stable"
+    deprecated = True
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
